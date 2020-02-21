@@ -318,6 +318,26 @@ E criar o método de configuração chamado InternalResourceViewResolver
 
 Pasta WEB-INF faz parte da especificação de servlets jsp e é uma pasta protegida pelo servidor por isso vamos deixar nossas views nela.
 
+Dentro dessa classe AppWebConfiguration o Spring não vai olhar todos os métodos ele vai querer que nós digamos para ele quais métodos devolvem 
+objetos que ele deve ficar de olho.
+
+
+InternalResourceViewResolver
+return resolver;
+
+configurar o caminho da nossa página 
+setPrefix("/WEB-INF/views/");
+
+vamos configurar a extensão da nossas views
+setSuffix(".jsp");
+
+Detalhe o spring não vai rodar todos os nosso métodos por default  ele vai querer que nós digamos qual método retorna uma  classe que ele conhece e  que ele irá usar para configuração.
+
+Agora iremos falar que esse método retorna uma classe gerenciada pelo spring e isso é feito através da annotation @Bean.
+
+Toda classe gerenciada pelo Spring é um bean.
+
+
 999352348 Eduardo
 
 
