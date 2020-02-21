@@ -1,0 +1,325 @@
+Spring MVC I
+Nesse curso vamos estudar alguns módulos do Spring MVC.
+
+Como todo bom projeto java quando vamos começar temos aquelas configurações iniciais para serem feitas e isso é sempre um pouco ou bastante trabalhoso.
+
+Por isso surgiu o JBoss Forge  um framework que servi para criar/ forjar 
+aquelas estrutura inicial do nosso projeto java já deixando o projeto com as configurações iniciais para nós nos preocuparmos em apenas programar.
+
+
+cd forge/bin/
+forge 
+inicial o terminal do JBoss Forge
+maven based
+
+[workspace]%
+project-new --named 
+project-new --named casadocodigo e isso cria a estrutura inicial do projeto baseado no maven 
+
+------------------------------------------
+botão direito import , existing maven project 
+
+E acabou , estamos com o projeto pronto para começar nossa brincadeira c.
+
+___
+ |
+ |----src/main/java 
+ |----src/main/resources
+ |----src/test/java 
+ |----src/test/resources
+
+ |----src/main/webapp
+ 	|
+    |------Index.jsp (livros de java , adroid, php, ruby e muito mais -
+Isso é Casa do Código)
+pom.xml
+
+
+src 
+	main 
+		webapp
+			index.html  ctrl + n 
+
+
+quick acess ou ctrl + 3  servers 
+
+
+Avaliando o projeto gerado pelo JBoss Forge
+Opinião do instrutor
+
+A grande vantagem ao utilizarmos o JBoss Forge é agilizar a configuração inicial do projeto, permitindo ganhar tempo indo direto para o código.
+
+O JBoss Forge é um gerador de projetos Java, e ele gera toda a estrutura base do projeto integrada ao Maven. Além disso, configura dependências (bibliotecas e frameworks), estrutura de pastas e gera configurações iniciais que normalmente envolve arquivos XML.
+
+Sem ele, em um projeto tipicamente Java EE, devemos criar vários arquivos XML manualmente, por exemplo: persistence.xml, web.xml, faces-config.xml, pom.xml, beans.xml entre outros.
+
+Temos um curso de Maven, caso queira aprender mais sobre essa magnífica ferramenta, no qual usamos neste projeto para principalmente gerenciarmos as dependências.
+
+----------------
+
+Não é bem oi que queremos falar, queremos usar o spring para configurar nosso projeto.
+
+Toda  vez que vamos começar a nossa brincadeira com o spring precisamos criar um controller do spring e o controller nada mais é do que uma classe.
+
+ctrl + n class
+br.com.casadocodigo.loja.controllers;
+public class HomeController {
+	
+}
+
+O spring precisar saber que essa classe é um controller nosso e como
+ele vai saber isso?
+Tem duas formas , ou ele vai para do xml e xml não lá uma coisa muito 
+agradável de se trabalhar ou através das anotações que são mais simples.
+
+Segunda forma de configurar projetos em java.
+
+@Controller
+
+E ela não esta sendo reconhecida ainda porque não dissemos ao maven que vamos usar o spring no nosso projeto.
+
+dependencies>
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>4.1.0.RELEASE</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>tomcat-servlet-api</artifactId>
+        <version>7.0.30</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>javax.servlet.jsp</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>2.1</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>javax.servlet.jsp.jstl</groupId>
+        <artifactId>jstl-api</artifactId>
+        <version>1.2</version>
+        <exclusions>
+            <exclusion>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.web</groupId>
+        <artifactId>jstl-impl</artifactId>
+        <version>1.2</version>
+        <exclusions>
+            <exclusion>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.6.1</version>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>1.6.1</version>
+        <scope>runtime</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.6.1</version>
+        <scope>runtime</scope>
+    </dependency>
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.16</version>
+        <scope>runtime</scope>
+    </dependency>
+</dependencies>
+
+br.com.casadocodigo.loja.controllers;
+
+@Controller
+public class HomeController {
+	
+	@RequestMapping("/")
+	public void index() {
+		System.out.println("Entrando na home da casa do código");
+	}
+}
+
+
+Qual endereço o controller atende? 
+Inicialmente vamos configurar a barra 
+
+Não funcionou!!! Nós não dissemos ao servidor que o Spring
+vai tomar conta das requisições do nosso projeto, não teve nenhuma configuração do Spring , nós apenas colocamos a biblioteca e ela sozinha não faz magica.
+
+
+Primeiro passo é falar para o servidor que temos alguém 
+que vai atender as requisições do nosso projeto a partir de context /  e  temos duas formas de fazer : a primeira é através de servlets e segunda é através de filtros.
+
+Nesse caso o spring tem uma servlet protinho para gente utilizar como sendo nosso servlet de configuração e podemos configurar o servlet via anotação ou xml, vamos preferir código java para configurar.
+
+
+A classe ServletSpringMVC  servi para fazer as configurações básicas, primarias do Spring mas ela não é uma classe qualquer e vamos precisar extenders uma classe do spring 
+
+AbstractAnnotationConfigServletInitializer classe responsável por inicializar o servlet do spring.(Classe de configuração).
+
+
+br.com.casadocodigo.loja.conf
+
+public class ServletSpringMVC extends AbstractAnnotationConfigServletInitializer {
+	
+	@Overrride
+	protected Class <?> [] getServletConfigClasses() {
+		return new Class[] {AppWebConfiguration.class};
+	}
+
+	@Overrride url q queremos que spring mapei
+	protected String [] getServletMappings() {
+		return new String [] {"/"};
+	}
+}
+
+
+Além de configurar qual url queremos que nosso Spring mapei , precisamos fazer com que o spring também saiba qual a classe de configuração do nosso controller e do projeto web.
+
+@Overrride
+protected Class <?> [] getServletConfigClasses() {
+	return new Class[] {AppWebConfiguration.class};
+}
+
+@EnableWebMvc (Spring MVC) vamos ter que dizer aonde 
+esta nossos controllers
+
+Vamos ter que falar para o Spring aonde encontrar nosso controller.
+
+@EnableWebMvc 
+@ComponentScan(basePackageClasses ={ HomeController.class} )
+public class AppWebConfiguration {
+	
+}
+
+Não configuramos o Spring , apenas adicionamos a biblioteca e ela sozinha não faz a magica.
+
+A primeira coisa é falar para o servidor que temos alguém que irá atender as requisições do meu projeto e as requisições a partir de context barra queremos que o spring atenda.
+
+Podemos fazer isso de duas formas : através de servlets ou através de filtros , nesse caso o Spring já tem um servlet prontinho para a  gente utilizar como servlet de configuração , podemos configura-lo por annotation ou xml, no nosso curso vamos sempre fazer a configuração por annotation de forma programatica.
+
+Servlet do spring por xml ou annotation 
+
+ServletSpringMVC não é uma classe qualquer é classe 
+de inicialização da servlet do spring e servi para fazer as 
+configurações básicas, primárias.
+
+Servlet de configuração pode ser configurado por xml ou código java e por ser compilavel vamos fazer essa.
+
+ServletSpringMvc extends AbstractAnnotationConfigServletInitializer
+
+public class ServletSpringMVC extends AbstractAnnotationConfigServletInitializer {
+	
+	@Overrride
+	protected Class <?> [] getServletConfigClasses() {
+		return new Class[] {AppWebConfiguration.class};
+	}
+
+	@Overrride url q queremos que spring mapei
+	protected String [] getServletMappings() {
+		return new String [] {"/"};
+	}
+}
+
+
+ServletSpringMvc servi para fazer as configurações básicas, configurações primárias
+uma configuração basica é dizer qual o path que o spring irá atender.
+
+Mas essa classe não pode ser uma classe simples, ela tem que pegar as configurações do spring e por isso temos que extender de AbstractAnnotationConfigServletInitializer. 
+
+
+Vamos configurar o path da classe da servlet spring. 
+
+String [] {"/"}
+
+String [] getServletMappings(){
+	 return new String [] {"/"};
+}
+
+Além da configuração da url que queremos que Spring mapeie temos 
+que fazer mais uma configuração, vamos fazer com que o spring conheça a classe de configuração que fala qual o controle vamos utilizar.
+
+Vamos fazer com que o spring conheça a classe de configuração que fala  qual o controle vamos utilizar.
+
+
+protected Class<?> [] getServletConfigClasses() {
+	return new Class[] {AppWebConfiguration.class};
+}
+
+AppWebConfiguration.class
+
+
+Essa classe de configuração sozinha não tem nenhum 
+segredo nela , a não ser que nós configuremos, duas formas de configurar annotation ou xml.
+
+
+
+Classe de configuração do nosso projeto Web
+@EnableWebMvc (habilita o uso do spring mvc e @ComponentScan
+faz o scan do nosso pacote de controllers)
+
+
+@EnableWebMVC (habilita o uso do spring mvc)
+@ComponentScan(basePackageClasses = {HomeController.class})
+public class AppWebConfiguration {
+	
+}
+
+Index é / mas nós temos um index no webapp então estamos conflitando
+com nosso controller.
+
+Ao tirar o index do webapp conseguimos chamar nosso controller , porém continuamos tendo erro por que o spring espera o nome de um recurso
+e nós não devolvemos nenhum nome.
+
+Então vamos devolver um nome para o recurso do spring e temos 
+mais um erro dessa vez 500
+Could not resolve view with name 'bemvindo' in servlet with name 'dispatcher'
+
+Isso ocorre porque não informamos para o Spring aonde estão localizadas as nossas páginas, isso também pode ser resolvido ao criar método 
+de configuração da nossa aplicação que devolve um resolvedor de views.
+
+
+Ele imprimiu de fato a mensagem do controller mas não achou uma view com nosso index.
+
+poderiamos colocar as paginas no webapp, mas o problema de colocar 
+diretamente é que o usuário pode acessar diretamente e isso faz 
+com que ele não passe por um controller ou seja as regras de negócio
+não serão executadas.
+
+Outro detalhe importante é aonde colocar nossa view , não queremos que usuário acesse nossa view na mão, já imaginou se ele  acessar a view sem passar pela lógica de negócio e ele ver a página quebrada.
+
+Então é uma boa prática em qualquer framework mvc não deixar as páginas visiveis para usuário.
+
+Nesse caso vamos criar uma pasta WEB-INF que é uma pasta protegida pelo servidor dentro das pasta webapp e isso irá forçar nosso usuário a sempre passar pelo controller.
+
+É uma boa prática de software sempre que trabalhamos com framework mvc proteger as paginas do usuário para que ele seja obrigado a passar por um controller que irá executar nossas lógicas de negócio.
+
+
+Precisamos falar para o spring aonde encontrar nossas páginas , mas essa não é uma configuração do servlet do spring , mas sim da aplicação.
+Por isso vamos em AppWebConfiguration.
+
+E criar o método de configuração chamado InternalResourceViewResolver
+
+Pasta WEB-INF faz parte da especificação de servlets jsp e é uma pasta protegida pelo servidor por isso vamos deixar nossas views nela.
+
+999352348 Eduardo
+
+
+
+
