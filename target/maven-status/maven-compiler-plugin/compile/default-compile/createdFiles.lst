@@ -1,0 +1,3 @@
+br\com\moradacodigo\loja\config\ServletSpringMvc.class
+br\com\moradacodigo\loja\controller\HomeController.class
+br\com\moradacodigo\loja\config\AppWebConfiguration.class
